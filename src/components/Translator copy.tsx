@@ -9,8 +9,6 @@ export const Translator = () => {
   const [recording, setRecording] = useState(false);
   const [translating, setTranslating] = useState(false);
   const [translationCount, setTranslationCount] = useState<number | null>(null);
-  const [originalText, setOriginalText] = useState<string>("");
-  const [translatedText, setTranslatedText] = useState<string>("");
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -22,16 +20,11 @@ export const Translator = () => {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
 
-  const { isLoading, handleAudio } = useVoiceTranslation({
-    onResult: ({ original, translated }: { original: string; translated: string }) => {
-      setOriginalText(original);
-      setTranslatedText(translated);
-    }
-  });
+  const { isLoading, handleAudio } = useVoiceTranslation();
 
   const increaseTranslationCounter = async () => {
     const counterRef = doc(db, 'translationCount', 'main');
-    await setDoc(counterRef, { count: increment(1) }, { merge: true });
+    await setDoc(doc(db, "translationCount", "n"), { count: 1 }, { merge: true });
     const updatedDoc = await getDoc(counterRef);
     const newCount = updatedDoc.data()?.count ?? null;
     setTranslationCount(newCount);
@@ -103,27 +96,30 @@ export const Translator = () => {
     }
   };
 
-  const stopRecordingAndTranslate = async () => {
-    if (!recording || !mediaRecorderRef.current) return;
+const stopRecordingAndTranslate = async () => {
+  if (!recording || !mediaRecorderRef.current) return;
 
-    mediaRecorderRef.current.onstop = async () => {
-      try {
-        console.log("🎤 Grabación terminada, enviando a traducción");
-        const blob = new Blob(chunksRef.current, { type: "audio/webm" });
-        stopMic();
-        setTranslating(true);
-        await handleAudio(blob);
-        await increaseTranslationCounter();
-      } catch (err) {
-        console.error("⚠️ Error en el flujo:", err);
-      } finally {
-        setTranslating(false);
-        setRecording(false);
-      }
-    };
 
-    mediaRecorderRef.current.stop();
-  };
+mediaRecorderRef.current.onstop = async () => {
+  try {
+    console.log("🎤 Grabación terminada, enviando a traducción");
+    const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+    stopMic();
+    setTranslating(true);
+    await handleAudio(blob); // puede estar fallando aquí
+    await increaseTranslationCounter();
+  } catch (err) {
+    console.error("⚠️ Error en el flujo:", err);
+  } finally {
+    setTranslating(false);
+    setRecording(false);
+  }
+};
+
+
+  mediaRecorderRef.current.stop();
+};
+
 
   const stopMic = () => {
     cancelAnimationFrame(animationIdRef.current!);
@@ -168,21 +164,11 @@ export const Translator = () => {
         </button>
       </div>
 
+
+
+
       {(isLoading || translating) && (
         <p className="mt-4 text-gray-700">⏳ Procesando...</p>
-      )}
-
-      {originalText && translatedText && (
-        <div className="mt-6 bg-white/80 rounded-lg p-4 shadow text-gray-800 w-full max-w-2xl">
-          <div className="flex items-start gap-2">
-            <span>🗣️</span>
-            <p className="font-medium">{originalText}</p>
-          </div>
-          <div className="flex items-start gap-2 mt-2">
-            <span>🌍</span>
-            <p className="italic text-green-800">{translatedText}</p>
-          </div>
-        </div>
       )}
 
       <footer className="text-center text-base text-gray-700 py-4 mt-10 border-t border-gray-300 w-full">
@@ -194,11 +180,11 @@ export const Translator = () => {
           <br /><br /><br />
           <em className="text-sm">versión Beta</em>
         </p>
-        {translationCount !== null && (
-          <p className="text-sm">
-            🔢 Traducciones realizadas: <span className="font-bold">{translationCount}</span>
-          </p>
-        )}
+              {translationCount !== null && (
+  <p className="text-sm">
+    🔢 Traducciones realizadas: <span className="font-bold">{translationCount}</span>
+  </p>
+)}
       </footer>
     </div>
   );

@@ -1,0 +1,50 @@
+      html, body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: url('/img/background.jpg') no-repeat center center fixed;
+        background-size: cover;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+      }
+
+.landing-wrapper {
+  background-image: url('/img/background.jpg'); /* Asegúrate que esta imagen esté en /public/img */
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.glass-container {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  border-radius: 15px;
+  padding: 30px;
+  width: 90%;
+  max-width: 800px;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  color: white;
+}
+
+.glass-container h1 {
+  font-size: 2.5rem;
+  text-shadow: 4px 4px 14px rgba(0, 0, 0, 1);
+  margin-bottom: 10px;
+}
+
+.glass-container p {
+  font-size: 1.2rem;
+  text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.95);
+}
+
+.placeholder-content {
+  margin: 30px 0;
+}
+
+.counter {
+  margin-top: 20px;
+  font-size: 1rem;
+}

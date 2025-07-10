@@ -1,21 +1,14 @@
 import { useState } from "react";
 import { sendAudio } from "../services/translatorService";
 
-interface VoiceTranslationOptions {
-  onResult?: (result: { original: string; translated: string }) => void;
-}
-
-export const useVoiceTranslation = (options?: VoiceTranslationOptions) => {
+export const useVoiceTranslation = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleAudio = async (audioBlob: Blob) => {
     setIsLoading(true);
-    try {
-      const { originalText, translatedText } = await sendAudio(audioBlob);
 
-      if (options?.onResult) {
-        options.onResult({ original: originalText, translated: translatedText });
-      }
+    try {
+      await sendAudio(audioBlob); // Solo llamamos y dejamos que el backend se encargue
     } catch (error) {
       console.error("Error en la traducción:", error);
     } finally {
